@@ -1,8 +1,21 @@
 import processing.core.*;
 
 public class App extends PApplet {
+    int highscore = 160;
+    int scene = 1;
 
-    int scene = 2;
+    float shipX = 455;
+    float shipY = 368;
+    float angle = 0;
+
+    boolean bulletActive = false;
+    float bulletX, bulletY;
+    float bulletVX, bulletVY;
+
+    boolean leftHeld = false;
+    boolean rightHeld = false;
+
+    float bulletSpeed = 12;
 
     public static void main(String[] args) {
         PApplet.main("App");
@@ -41,16 +54,42 @@ public class App extends PApplet {
 
             fill(87, 35, 47);
             textSize(30);
-            text("PRESS TO VIEW THE HIGH SCORES", 50, 650);
+            text("PRESS TO VIEW THE HIGH SCORE", 50, 650);
             text("PRESS TO START GAME", 600, 650);
         }
 
         if (scene == 3) {
             background(0);
-            fill(255);
-            rect(455, 368, 55, 100);
-            noStroke();
+            fill(87, 35, 47);
+            textSize(80);
+            text("HiGHEST SCORE RECORDED:", 25, 200);
+            textSize(100);
+            text(highscore, 450, 400);
+        }
 
+        if (scene == 4) {
+            background(0);
+            pushMatrix();
+            translate(455, 368);
+            rotate(angle);
+            rectMode(CENTER);
+            fill(255);
+            noStroke();
+            rect(0, 0, 55, 100);
+            popMatrix();
+
+            if (bulletActive) {
+                bulletX += bulletVX;
+                bulletY += bulletVY;
+
+                fill(255);
+                ellipse(bulletX, bulletY, 10, 10);
+                noStroke();
+            }
+
+            if (bulletX < 0 || bulletX > width || bulletY < 0 || bulletY > height) {
+                bulletActive = false;
+            }
         }
     }
 
@@ -60,16 +99,33 @@ public class App extends PApplet {
                 scene = 2;
             }
         }
+
+        if (scene == 4) {
+            if (keyCode == LEFT) {
+                angle -= 0.2f;
+            }
+            if (keyCode == RIGHT) {
+                angle += 0.2f;
+            }
+        }
+
+        if (key == ' ' && !bulletActive) {
+            bulletActive = true;
+
+            bulletX = shipX;
+            bulletY = shipY;
+
+            bulletVX = cos(angle) * bulletSpeed;
+            bulletVY = sin(angle) * bulletSpeed;
+        }
     }
 
     public void mousePressed() {
         if (scene == 2) {
-            if (mouseX > 40 && mouseX < 610 && mouseY > 450 && mouseY < 60) {
-                System.out.println("yep");
+            if (mouseX > 40 && mouseX < 490 && mouseY > 610 && mouseY < 670) {
                 scene = 3;
-            } else if (mouseX > 590 && mouseX < 610 && mouseY > 307 && mouseY < 60) {
-                System.out.println("yep");
-                scene = 3;
+            } else if (mouseX > 590 && mouseX < 897 && mouseY > 610 && mouseY < 670) {
+                scene = 4;
             }
 
         }
