@@ -1,8 +1,10 @@
 import processing.core.*;
+import java.security.Key;
+import java.util.ArrayList;
 
 public class App extends PApplet {
     int highscore = 160;
-    int scene = 1;
+    int scene = 2;
 
     float shipX = 455;
     float shipY = 368;
@@ -15,7 +17,9 @@ public class App extends PApplet {
     boolean leftHeld = false;
     boolean rightHeld = false;
 
-    float bulletSpeed = 12;
+    float bulletSpeed = 20;
+
+    ArrayList<Astroid> astroids = new ArrayList<>();
 
     public static void main(String[] args) {
         PApplet.main("App");
@@ -23,6 +27,10 @@ public class App extends PApplet {
 
     public void setup() {
         background(0);
+        for (int i = 0; i < 5; i++) {
+            astroidMaker();
+        }
+
     }
 
     public void settings() {
@@ -33,9 +41,9 @@ public class App extends PApplet {
         if (scene == 1) {
             textSize(80);
             fill(87, 35, 47);
-            text("Welcome to Astroids!", 200, 200);
-            text("Please press the tab key", 20, 400);
-            text("to view the rules", 100, 500);
+            text("Welcome to Astroids!", 150, 200);
+            text("Please press the tab key", 100, 300);
+            text("to view the rules", 280, 400);
         }
         if (scene == 2) {
             background(0);
@@ -75,7 +83,7 @@ public class App extends PApplet {
             rectMode(CENTER);
             fill(255);
             noStroke();
-            rect(0, 0, 55, 100);
+            rect(0, 0, 40, 60);
             popMatrix();
 
             if (bulletActive) {
@@ -90,6 +98,7 @@ public class App extends PApplet {
             if (bulletX < 0 || bulletX > width || bulletY < 0 || bulletY > height) {
                 bulletActive = false;
             }
+
         }
     }
 
@@ -131,4 +140,12 @@ public class App extends PApplet {
         }
     }
 
+
+    public void astroidMaker(){
+            int x = (int)random(1000);
+            int y = (int)random(800);
+
+            Astroid a = new Astroid(250, 10, this, x, y);
+            astroids.add(a); 
+    }
 }
