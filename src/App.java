@@ -1,10 +1,9 @@
 import processing.core.*;
-import java.security.Key;
 import java.util.ArrayList;
 
 public class App extends PApplet {
     int highscore = 160;
-    int scene = 2;
+    int scene = 1;
 
     float shipX = 455;
     float shipY = 368;
@@ -14,9 +13,6 @@ public class App extends PApplet {
     float bulletX, bulletY;
     float bulletVX, bulletVY;
 
-    boolean leftHeld = false;
-    boolean rightHeld = false;
-
     float bulletSpeed = 20;
 
     ArrayList<Astroid> astroids = new ArrayList<>();
@@ -25,16 +21,15 @@ public class App extends PApplet {
         PApplet.main("App");
     }
 
+    public void settings() {
+        size(1000, 800);
+    }
+
     public void setup() {
         background(0);
         for (int i = 0; i < 5; i++) {
             astroidMaker();
         }
-
-    }
-
-    public void settings() {
-        size(1000, 800);
     }
 
     public void draw() {
@@ -45,6 +40,7 @@ public class App extends PApplet {
             text("Please press the tab key", 100, 300);
             text("to view the rules", 280, 400);
         }
+
         if (scene == 2) {
             background(0);
             textSize(50);
@@ -57,7 +53,6 @@ public class App extends PApplet {
 
             fill(255);
             rect(40, 610, 450, 60);
-
             rect(590, 610, 307, 60);
 
             fill(87, 35, 47);
@@ -77,8 +72,10 @@ public class App extends PApplet {
 
         if (scene == 4) {
             background(0);
+
+            
             pushMatrix();
-            translate(455, 368);
+            translate(shipX, shipY); 
             rotate(angle);
             rectMode(CENTER);
             fill(255);
@@ -86,46 +83,44 @@ public class App extends PApplet {
             rect(0, 0, 40, 60);
             popMatrix();
 
+        
+            for (Astroid a : astroids) {
+                a.update();
+                a.display();
+            }
+
+        
             if (bulletActive) {
                 bulletX += bulletVX;
                 bulletY += bulletVY;
 
                 fill(255);
-                ellipse(bulletX, bulletY, 10, 10);
                 noStroke();
-            }
+                ellipse(bulletX, bulletY, 10, 10);
 
-            if (bulletX < 0 || bulletX > width || bulletY < 0 || bulletY > height) {
-                bulletActive = false;
+                if (bulletX < 0 || bulletX > width || bulletY < 0 || bulletY > height) {
+                    bulletActive = false;
+                }
             }
-
         }
     }
 
     public void keyPressed() {
-        if (scene == 1) {
-            if (key == TAB) {
-                scene = 2;
-            }
+        if (scene == 1 && key == TAB) {
+            scene = 2;
         }
 
         if (scene == 4) {
-            if (keyCode == LEFT) {
-                angle -= 0.2f;
+            if (keyCode == LEFT) angle -= 0.2f;
+            if (keyCode == RIGHT) angle += 0.2f;
+
+            if (key == ' ' && !bulletActive) {
+                bulletActive = true;
+                bulletX = shipX;
+                bulletY = shipY;
+                bulletVX = cos(angle) * bulletSpeed;
+                bulletVY = sin(angle) * bulletSpeed;
             }
-            if (keyCode == RIGHT) {
-                angle += 0.2f;
-            }
-        }
-
-        if (key == ' ' && !bulletActive) {
-            bulletActive = true;
-
-            bulletX = shipX;
-            bulletY = shipY;
-
-            bulletVX = cos(angle) * bulletSpeed;
-            bulletVY = sin(angle) * bulletSpeed;
         }
     }
 
@@ -136,16 +131,39 @@ public class App extends PApplet {
             } else if (mouseX > 590 && mouseX < 897 && mouseY > 610 && mouseY < 670) {
                 scene = 4;
             }
-
         }
     }
 
+    public void astroidMaker() {
+        int edge = (int) random(4);
 
-    public void astroidMaker(){
-            int x = (int)random(1000);
-            int y = (int)random(800);
+        int x = 0;
+        int y = 0;
 
-            Astroid a = new Astroid(250, 10, this, x, y);
-            astroids.add(a); 
+   
+        if (edge == 0) {            
+            x = (int) random(width);
+            y = -20;
+        } else if (edge == 1) {    
+            x = (int) random(width);
+            y = height + 20;
+        } else if (edge == 2) {     
+            x = -20;
+            y = (int) random(height);
+        } else {                  
+            x = width + 20;
+            y = (int) random(height);
+        }
+
+        Astroid a = new Astroid(100, this, x, y);
+
+        
+        float angleToShip = atan2(shipY - y, shipX - x);
+        float speed = 3; 
+        float vx = cos(angleToShip) * speed;
+        float vy = sin(angleToShip) * speed;
+
+        a.setVelocity(vx, vy);
+        astroids.add(a);
     }
 }
