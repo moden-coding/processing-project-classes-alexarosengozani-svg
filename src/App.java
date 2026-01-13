@@ -2,26 +2,27 @@ import processing.core.*;
 import java.util.ArrayList;
 
 public class App extends PApplet {
+    private float shipSpeed = 9;
 
-    float shipSpeed = 7;
+    private boolean astroidshow = true;
 
-    int highscore = 160;
-    int scene = 1;
+    private int highscore = 160;
+    private int scene = 1;
 
-    float shipX = 455;
-    float shipY = 368;
+    private float shipX = 455;
+    private float shipY = 368;
 
-    boolean leftPressed = false;
-    boolean rightPressed = false;
-    boolean upPressed = false;
-    boolean downPressed = false;
+    private boolean leftPressed = false;
+    private boolean rightPressed = false;
+    private boolean upPressed = false;
+    private boolean downPressed = false;
 
-    boolean bulletActive = false;
-    float bulletX, bulletY;
-    float bulletVX, bulletVY;
-    float bulletSpeed = 40;
+    private boolean bulletActive = false;
+    private float bulletX, bulletY;
+    private float bulletVX, bulletVY;
+    private float bulletSpeed = 40;
 
-    double timer;
+    private double timer;
 
     ArrayList<Astroid> astroids = new ArrayList<>();
 
@@ -38,12 +39,12 @@ public class App extends PApplet {
 
         astroids.clear();
         for (int i = 0; i < 5; i++) {
-            astroids.add(new Astroid(60, this));
+            astroids.add(new Astroid(80, this));
         }
     }
 
     public void draw() {
-        if (scene == 1) {
+        if (scene == 1) { // starting scene welcomes player
             background(0);
             textSize(80);
             fill(87, 35, 47);
@@ -57,7 +58,7 @@ public class App extends PApplet {
             background(0);
             textSize(50);
             fill(87, 35, 47);
-            text("These are the rules to follow:", 200, 150);
+            text("These are the rules to follow:", 200, 150); // explains the rules of my game
             text("press the arrow keys to move your ship", 60, 250);
             text("press the space bar to shoot the astroids", 60, 350);
             text("the farther you get, the harder the level gets", 30, 450);
@@ -84,24 +85,35 @@ public class App extends PApplet {
 
         if (scene == 4) {
             background(0);
+            if (leftPressed) {
+                shipX -= shipSpeed;
+            }
+            if (rightPressed) {
+                shipX += shipSpeed;
+            }
+            if (upPressed) {
+                shipY -= shipSpeed;
+            }
+            if (downPressed) {
+                shipY += shipSpeed;
+            }
 
-            if (leftPressed)  shipX -= shipSpeed;
-            if (rightPressed) shipX += shipSpeed;
-            if (upPressed)    shipY -= shipSpeed;
-            if (downPressed)  shipY += shipSpeed;
-
-            shipX = constrain(shipX, 0, width);
-            shipY = constrain(shipY, 0, height);
+            // shipX = constrain(shipX, 0, width);
+            // shipY = constrain(shipY, 0, height);
 
             rectMode(CENTER);
             fill(255);
             noStroke();
             rect(shipX, shipY, 40, 60);
 
-            // asteroids
             for (Astroid a : astroids) {
+                if (dist(bulletX, bulletY, a.getX(), a.getY()) > 70) {
+                    astroids.remove(a);
+                }
+
                 a.update();
                 a.display();
+
             }
 
             if (bulletActive) {
@@ -122,6 +134,7 @@ public class App extends PApplet {
             timer = (millis() / 100) / 10.0;
             text("Time: ", 20, 50);
             text("" + timer, 100, 50);
+
         }
     }
 
@@ -131,26 +144,41 @@ public class App extends PApplet {
         }
 
         if (scene == 4) {
-            if (keyCode == LEFT)  leftPressed = true;
-            if (keyCode == RIGHT) rightPressed = true;
-            if (keyCode == UP)    upPressed = true;
-            if (keyCode == DOWN)  downPressed = true;
-
-            if (key == ' ' && !bulletActive) {
-                bulletActive = true;
-                bulletX = shipX;
-                bulletY = shipY;
-                bulletVX = 0;
-                bulletVY = -bulletSpeed;
+            if (keyCode == LEFT) {
+                leftPressed = true;
             }
+
+            if (keyCode == RIGHT) {
+                rightPressed = true;
+            }
+
+            if (keyCode == UP) {
+                upPressed = true;
+            }
+
+            if (keyCode == DOWN) {
+                downPressed = true;
+            }
+        }
+
+        if (key == ' ' && !bulletActive) {
+            bulletActive = true;
+            bulletX = shipX;
+            bulletY = shipY;
+            bulletVX = 0;
+            bulletVY = -bulletSpeed;
         }
     }
 
     public void keyReleased() {
-        if (keyCode == LEFT)  leftPressed = false;
-        if (keyCode == RIGHT) rightPressed = false;
-        if (keyCode == UP)    upPressed = false;
-        if (keyCode == DOWN)  downPressed = false;
+        if (keyCode == LEFT)
+            leftPressed = false;
+        if (keyCode == RIGHT)
+            rightPressed = false;
+        if (keyCode == UP)
+            upPressed = false;
+        if (keyCode == DOWN)
+            downPressed = false;
     }
 
     public void mousePressed() {
