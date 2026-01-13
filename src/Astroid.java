@@ -5,30 +5,32 @@ public class Astroid {
     private int color;
     private PApplet canvas;
 
+    private int health;
 
-    private float x; 
+    private float x;
     private float y;
 
     private float ySpeed;
+
+    private boolean offBottom;
 
     public Astroid(int sizes, PApplet c) {
         canvas = c;
         size = sizes;
         color = canvas.color(93, 72, 83);
-        respawn(); 
+        respawn();
+        offBottom = false;
+        health = 10;
     }
 
     private void respawn() {
         x = canvas.random(canvas.width);
-        y = canvas.random(-200, -50);    
-        ySpeed = canvas.random(2, 7);    
+        y = canvas.random(-200, -50);
+        ySpeed = canvas.random(2, 7);
     }
 
     public void update() {
         y += ySpeed;
-        if (y > canvas.height + size) {
-            respawn();
-        }
     }
 
     public void display() {
@@ -38,11 +40,16 @@ public class Astroid {
         canvas.ellipse(x, y, size, size);
     }
 
-    public float getX(){
+    public float getX() {
         return x;
     }
 
-     public float getY(){
+    public float getY() {
         return y;
     }
+
+    public boolean isOffBottom() {
+        return y - size / 2.0f > canvas.height;
+    }
+
 }

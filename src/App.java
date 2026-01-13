@@ -12,6 +12,8 @@ public class App extends PApplet {
     private float shipX = 455;
     private float shipY = 368;
 
+    private int playerHealth = 10;
+
     private boolean leftPressed = false;
     private boolean rightPressed = false;
     private boolean upPressed = false;
@@ -106,14 +108,18 @@ public class App extends PApplet {
             noStroke();
             rect(shipX, shipY, 40, 60);
 
-            for (Astroid a : astroids) {
-                if (dist(bulletX, bulletY, a.getX(), a.getY()) > 70) {
-                    astroids.remove(a);
-                }
+            // for(int i = 0; i < astroids.size(); i++){
+            // if (dist(bulletX, bulletY, a.getX(), a.getY()) > 70) {
+            // astroids.remove(i);
+            // }
 
+            for (Astroid a : astroids) {
                 a.update();
                 a.display();
 
+                if (a.isOffBottom()) {
+                    playerHealth--;
+                }
             }
 
             if (bulletActive) {
@@ -134,7 +140,6 @@ public class App extends PApplet {
             timer = (millis() / 100) / 10.0;
             text("Time: ", 20, 50);
             text("" + timer, 100, 50);
-
         }
     }
 
