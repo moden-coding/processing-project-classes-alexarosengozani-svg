@@ -29,9 +29,17 @@ public class Astroid {
         ySpeed = canvas.random(2, 7);
     }
 
-    public void update() {
-        y += ySpeed;
+    public boolean update() {
+    y += ySpeed;
+
+    // hit bottom ONCE
+    if (y + size / 2.0f >= canvas.height) {
+        respawn();
+        return true;
     }
+    return false;
+}
+
 
     public void display() {
         canvas.rectMode(PApplet.CORNER);

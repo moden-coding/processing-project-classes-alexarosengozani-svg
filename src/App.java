@@ -7,12 +7,12 @@ public class App extends PApplet {
     private boolean astroidshow = true;
 
     private int highscore = 160;
-    private int scene = 1;
+    private int scene = 2;
 
     private float shipX = 455;
     private float shipY = 368;
 
-    private int playerHealth = 10;
+    private int playerHealth = 1;
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
@@ -26,6 +26,9 @@ public class App extends PApplet {
 
     private double timer;
 
+    PFont titleFont;
+    PFont defaultFont;
+
     ArrayList<Astroid> astroids = new ArrayList<>();
 
     public static void main(String[] args) {
@@ -34,9 +37,13 @@ public class App extends PApplet {
 
     public void settings() {
         size(1000, 800);
+
     }
 
     public void setup() {
+        defaultFont = createFont("SansSerif", 32); // looks like Processing default
+        titleFont = createFont("Comic Sans MS", 80);
+
         background(0);
 
         astroids.clear();
@@ -46,6 +53,7 @@ public class App extends PApplet {
     }
 
     public void draw() {
+        textFont(defaultFont);
         if (scene == 1) { // starting scene welcomes player
             background(0);
             textSize(80);
@@ -114,12 +122,18 @@ public class App extends PApplet {
             // }
 
             for (Astroid a : astroids) {
-                a.update();
+                boolean wentOff = a.update(); // update tells you if it hit bottom
                 a.display();
 
-                if (a.isOffBottom()) {
+                if (wentOff) {
                     playerHealth--;
                 }
+            }
+
+            if (playerHealth <= 0) {
+                playerHealth = 0;
+                scene = 5;
+
             }
 
             if (bulletActive) {
@@ -136,11 +150,25 @@ public class App extends PApplet {
             }
 
             fill(255);
+            text("Health: ", 800, 50);
+            text("" + playerHealth, 900, 50);
             textSize(30);
             timer = (millis() / 100) / 10.0;
             text("Time: ", 20, 50);
             text("" + timer, 100, 50);
         }
+
+        if (scene != 5)
+            textFont(defaultFont);
+
+        if (scene == 5) {
+            background(244, 194, 194);
+            textFont(titleFont);
+            textSize(100);
+            fill(0);
+            text("GAME OVER", 100, 500);
+        }
+
     }
 
     public void keyPressed() {
