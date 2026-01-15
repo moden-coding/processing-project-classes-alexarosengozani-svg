@@ -2,17 +2,20 @@ import processing.core.*;
 import java.util.ArrayList;
 
 public class App extends PApplet {
+    private Decorations decorations;
+
     private float shipSpeed = 9;
 
     private boolean astroidshow = true;
 
     private int highscore = 160;
-    private int scene = 2;
+    private int scene = 1;
 
     private float shipX = 455;
     private float shipY = 368;
 
-    private int playerHealth = 1;
+    private int playerHealth = 5;
+    private int score = 0;
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
@@ -44,6 +47,8 @@ public class App extends PApplet {
         defaultFont = createFont("SansSerif", 32); // looks like Processing default
         titleFont = createFont("Comic Sans MS", 80);
 
+        decorations = new Decorations(this);
+
         background(0);
 
         astroids.clear();
@@ -58,15 +63,19 @@ public class App extends PApplet {
             background(0);
             textSize(80);
             fill(87, 35, 47);
-            text("Welcome to Astroids!", 150, 200);
+            text("Welcome to Astroids!", 120, 200);
             textSize(80);
-            text("Please press the tab key", 100, 300);
-            text("to view the rules", 250, 400);
+            text("Please press the tab key", 60, 300);
+            text("to view the rules", 230, 400);
+
+            for (int i = 0; i < 5; i++) {
+                decorations.drawStars();
+            }
         }
 
         if (scene == 2) {
             background(0);
-            textSize(50);
+            textSize(40);
             fill(87, 35, 47);
             text("These are the rules to follow:", 200, 150); // explains the rules of my game
             text("press the arrow keys to move your ship", 60, 250);
@@ -79,9 +88,9 @@ public class App extends PApplet {
             rect(590, 610, 307, 60);
 
             fill(87, 35, 47);
-            textSize(30);
+            textSize(27);
             text("PRESS TO VIEW THE HIGH SCORE", 50, 650);
-            text("PRESS TO START GAME", 600, 650);
+            text("PRESS TO START GAME", 597, 650);
         }
 
         if (scene == 3) {
@@ -108,25 +117,49 @@ public class App extends PApplet {
                 shipY += shipSpeed;
             }
 
-            // shipX = constrain(shipX, 0, width);
-            // shipY = constrain(shipY, 0, height);
+            shipX = constrain(shipX, 0, width);
+            shipY = constrain(shipY, 0, height);
 
             rectMode(CENTER);
             fill(255);
             noStroke();
             rect(shipX, shipY, 40, 60);
+            for (int i = astroids.size() - 1; i >= 0; i--) {
+                Astroid a = astroids.get(i);
 
-            // for(int i = 0; i < astroids.size(); i++){
-            // if (dist(bulletX, bulletY, a.getX(), a.getY()) > 70) {
-            // astroids.remove(i);
-            // }
+                // only allow scoring if asteroid is above the ship
+                boolean asteroidAbove = a.getY() < shipY;
 
-            for (Astroid a : astroids) {
-                boolean wentOff = a.update(); // update tells you if it hit bottom
+                if (bulletActive && asteroidAbove &&
+                        dist(bulletX, bulletY, a.getX(), a.getY()) < 70) {
+
+                    astroids.remove(i);
+                    score++;
+
+                    bulletActive = false; // optional: bullet disappears after 1 hit
+                    astroids.add(new Astroid(80, this)); // optional: replace it
+                }
+            }
+
+            for (int i = astroids.size() - 1; i >= 0; i--) {
+                Astroid a = astroids.get(i);
+
+                a.update();
                 a.display();
 
-                if (wentOff) {
+                // ship is 40x60, so use a collision radius around ~35-45
+                float d = dist(shipX, shipY, a.getX(), a.getY());
+
+                if (d < 45) { // <-- tweak this number if needed
                     playerHealth--;
+                    astroids.remove(i); // asteroid disappears
+                    astroids.add(new Astroid(80, this)); // optional: spawn a new one
+                }
+            }
+
+            if (astroids.size() == 0) {
+                for (int i = 0; i < 5; i++) {
+                    astroids.add(new Astroid(80, this));
                 }
             }
 
@@ -151,11 +184,15 @@ public class App extends PApplet {
 
             fill(255);
             text("Health: ", 800, 50);
-            text("" + playerHealth, 900, 50);
+            text("" + playerHealth, 900, 100);
+
             textSize(30);
             timer = (millis() / 100) / 10.0;
             text("Time: ", 20, 50);
             text("" + timer, 100, 50);
+
+            text("Score: ", 300, 50);
+            text("" + score, 400, 50);
         }
 
         if (scene != 5)
@@ -166,7 +203,17 @@ public class App extends PApplet {
             textFont(titleFont);
             textSize(100);
             fill(0);
-            text("GAME OVER", 100, 500);
+            text("GAME OVER", 200, 200);
+
+            fill(255);
+            noStroke();
+            rect(190, 335, 617, 78);
+
+            fill(0);
+            textSize(60);
+            text("PRESS TO RESTART", 200, 400);
+            playerHealth = 5;
+            timer = 0;
         }
 
     }
@@ -220,6 +267,12 @@ public class App extends PApplet {
                 scene = 3;
             } else if (mouseX > 590 && mouseX < 897 && mouseY > 610 && mouseY < 670) {
                 scene = 4;
+            }
+        }
+
+        if (scene == 5) {
+            if (mouseX > 190 && mouseX < 190 + 617 && mouseY > 335 && mouseY < 335 + 78) {
+                scene = 1;
             }
         }
     }
